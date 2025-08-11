@@ -1,0 +1,23 @@
+import pg from 'pg';
+const { Pool } = pg;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+export async function handler(event, context) {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serverTime: result.rows[0] })
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
+}
